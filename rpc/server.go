@@ -239,6 +239,7 @@ func (s *Server) Stop() {
 
 // createSubscription will call the subscription callback and returns the subscription id or error.
 func (s *Server) createSubscription(ctx context.Context, c ServerCodec, req *serverRequest) (ID, error) {
+	fmt.Println("Called createSubscription function")
 	// subscription have as first argument the context following optional arguments
 	args := []reflect.Value{req.callb.rcvr, reflect.ValueOf(ctx)}
 	args = append(args, req.args...)
@@ -286,6 +287,7 @@ func (s *Server) handle(ctx context.Context, codec ServerCodec, req *serverReque
 			notifier.activate(subid, req.svcname)
 		}
 
+		fmt.Println("Received notification for a method: ", activateSub)
 		return codec.CreateResponse(req.id, subid), activateSub
 	}
 
@@ -329,7 +331,7 @@ func (s *Server) exec(ctx context.Context, codec ServerCodec, req *serverRequest
 	} else {
 		response, callback = s.handle(ctx, codec, req)
 	}
-
+	fmt.Println("server.exec - response : ", response)
 	if err := codec.Write(response); err != nil {
 		log.Error(fmt.Sprintf("%v\n", err))
 		codec.Close()
@@ -337,6 +339,7 @@ func (s *Server) exec(ctx context.Context, codec ServerCodec, req *serverRequest
 
 	// when request was a subscribe request this allows these subscriptions to be actived
 	if callback != nil {
+		fmt.Println("server.exec - callback is being called...", callback)
 		callback()
 	}
 }

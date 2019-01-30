@@ -19,7 +19,9 @@ package rpc
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 var (
@@ -102,6 +104,11 @@ func (n *Notifier) Notify(id ID, data interface{}) error {
 }
 
 func (n *Notifier) send(sub *Subscription, data interface{}) error {
+	
+	head := data.(*types.Header)
+	fmt.Println("New block mined Number: ", head.Number);
+
+	//fmt.Println("subscription.send - data ")
 	notification := n.codec.CreateNotification(string(sub.ID), sub.namespace, data)
 	err := n.codec.Write(notification)
 	if err != nil {
@@ -133,15 +140,18 @@ func (n *Notifier) unsubscribe(id ID) error {
 // the subscription ID was sent to client. This prevents notifications being
 // send to the client before the subscription ID is send to the client.
 func (n *Notifier) activate(id ID, namespace string) {
+	fmt.Println("subscription.activate - calling the subscription of namespace - ", namespace)
 	n.subMu.Lock()
 	defer n.subMu.Unlock()
 
 	if sub, found := n.inactive[id]; found {
+		fmt.Println("subscription.activate - about to send bufferred notifications...", n.buffer[id])
 		sub.namespace = namespace
 		n.active[id] = sub
 		delete(n.inactive, id)
 		// Send buffered notifications.
 		for _, data := range n.buffer[id] {
+			fmt.Println("Data in notifier: ", data)
 			n.send(sub, data)
 		}
 		delete(n.buffer, id)

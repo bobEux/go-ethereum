@@ -439,6 +439,7 @@ func (c *Client) send(ctx context.Context, op *requestOp, msg interface{}) error
 }
 
 func (c *Client) write(ctx context.Context, msg interface{}) error {
+	fmt.Println("In client.write: ", msg)
 	deadline, ok := ctx.Deadline()
 	if !ok {
 		deadline = time.Now().Add(defaultWriteTimeout)

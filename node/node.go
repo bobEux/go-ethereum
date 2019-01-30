@@ -369,6 +369,7 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 	if endpoint == "" {
 		return nil
 	}
+	fmt.Println("Starting WS endpoint ........")
 	listener, handler, err := rpc.StartWSEndpoint(endpoint, apis, modules, wsOrigins, exposeAll)
 	if err != nil {
 		return err

@@ -345,7 +345,6 @@ func (c *jsonCodec) CreateNotification(subid, namespace string, event interface{
 func (c *jsonCodec) Write(res interface{}) error {
 	c.encMu.Lock()
 	defer c.encMu.Unlock()
-
 	return c.encode(res)
 }
 
